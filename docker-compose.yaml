@@ -7,8 +7,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
 
-    AWS_ACCESS_KEY_ID: "AKIAYMWAOGUYZ6PBAQ5T"
-    AWS_SECRET_ACCESS_KEY: "zdyWjNbNJi6gde7jmw/Ss8qjpdaIHt3HqDBv4urt"
+    AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
     AWS_DEFAULT_REGION: "us-east-2"
 
     _PIP_ADDITIONAL_REQUIREMENTS: "boto3 requests pandas"
