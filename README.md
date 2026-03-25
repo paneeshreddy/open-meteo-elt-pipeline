@@ -76,4 +76,4 @@ README.md
 
 ## 💼 Author
 
-Aneesh Reddy
+Aneesh Pasnoor
