@@ -1,135 +1,221 @@
-# 🚀 End-to-End ETL Pipeline using Apache Airflow, Docker & AWS S3
+# 🚀 Open-Meteo ETL Pipeline
 
-![Airflow](https://img.shields.io/badge/Airflow-2.9-blue)
-![AWS](https://img.shields.io/badge/AWS-S3-orange)
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+A containerized end-to-end data engineering pipeline that extracts weather data from a public API, transforms it using Python and Pandas, and loads the processed data into Amazon S3 using Apache Airflow for workflow orchestration.
 
 ---
+
 ## 📌 Overview
 
-This project demonstrates an end-to-end **ETL (Extract, Transform, Load)** pipeline using **Apache Airflow**, **Docker**, and **AWS S3**.
+This project demonstrates a production-style ETL workflow using:
 
-The pipeline:
+- Apache Airflow
+- Python
+- Pandas
+- Requests
+- Boto3
+- Docker
+- Amazon S3
 
-* Extracts data from a public API
-* Transforms it using Pandas
-* Loads the processed data into AWS S3
+The pipeline follows:
+
+**Extract → Transform → Load**
+
+1. Extract weather data from a public API.
+2. Transform and clean the data using Pandas.
+3. Load the processed dataset into Amazon S3.
+4. Use Apache Airflow to orchestrate and monitor the workflow.
+
 ---
 
 ## 🏗️ Architecture
 
+```text
+                 Public Weather API
+                         |
+                         | Extract
+                         v
+                +-------------------+
+                |   Apache Airflow  |
+                |       DAG         |
+                +---------+---------+
+                          |
+                          v
+                +-------------------+
+                | Python + Pandas   |
+                | Transformation    |
+                +---------+---------+
+                          |
+                          | Load
+                          v
+                +-------------------+
+                |     Amazon S3     |
+                | Processed Dataset |
+                +-------------------+
+
+              Docker / Docker Compose
+              runs the Airflow environment
 ```
-        +----------------------+
-        |   Public API         |
-        +----------+-----------+
-                   |
-                   v
-        +----------------------+
-        |   Apache Airflow     |
-        |  (Scheduler + DAGs)  |
-        +----------+-----------+
-                   |
-        +----------+-----------+
-        |                      |
-        v                      v
-+----------------+     +----------------+
-|   Transform    |     |   Logging      |
-| (Pandas)       |     | (Airflow Logs) |
-+----------------+     +----------------+
-                   |
-                   v
-        +----------------------+
-        |      AWS S3          |
-        | (Final Output Data)  |
-        +----------------------+
-```
+
 ---
 
-## ⚙️ Tech Stack
+## 🔄 Data Flow
 
-* Apache Airflow
-* Python (Pandas, Requests, Boto3)
-* Docker
-* AWS S3
+### 1. Extract
+
+The Airflow DAG retrieves data from a public weather API using Python and `requests`.
+
+### 2. Transform
+
+The extracted data is processed using Pandas.
+
+Transformations include:
+
+- Cleaning raw API data
+- Selecting required fields
+- Creating derived columns
+- Preparing analytics-ready records
+
+### 3. Load
+
+The transformed dataset is uploaded to Amazon S3 using `boto3`.
+
+### 4. Orchestration
+
+Apache Airflow manages the workflow, task dependencies, scheduling, and execution logs.
+
 ---
-## 🔄 Workflow
-1. **Extract**
-   * Fetch data from a public API using `requests`
-2. **Transform**
-   * Clean and process data using `pandas`
-   * Example: Add derived columns like `title_length`
-3. **Load**
-   * Upload processed data to AWS S3 bucket using `boto3`
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Pipeline development |
+| Apache Airflow | Workflow orchestration |
+| Pandas | Data transformation |
+| Requests | API data extraction |
+| Boto3 | AWS integration |
+| Amazon S3 | Cloud data storage |
+| Docker | Containerization |
+| Docker Compose | Local environment |
+
 ---
+
+## 📂 Project Structure
+
+```text
+open-meteo-elt-pipeline/
+├── dags/
+│   └── <airflow_dag>.py
+├── docker-compose.yaml
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
+
+---
+
 ## ▶️ How to Run
+
 ### 1. Clone the repository
-```
+
+```bash
 git clone https://github.com/paneeshreddy/open-meteo-elt-pipeline.git
 cd open-meteo-elt-pipeline
 ```
-### 2. Start Airflow
-```
+
+### 2. Start the Airflow environment
+
+```bash
 docker compose up -d
 ```
-### 3. Access Airflow UI
-```
+
+### 3. Open the Airflow UI
+
+Open:
+
+```text
 http://localhost:8080
 ```
+
+From the Airflow UI, enable and trigger the ETL DAG.
+
 ---
+
 ## 🔐 Environment Setup
-Create a `.env` file (DO NOT commit this file):
-```
+
+Create a `.env` file locally and **do not commit it**.
+
+```text
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_DEFAULT_REGION=us-east-2
 ```
----
-## 🔐 Security
-* AWS credentials are managed using environment variables
-* No secrets are stored in code
-* `.env` file is excluded via `.gitignore`
+
+AWS credentials should be provided through environment variables or another secure credential mechanism.
+
 ---
 
-## 📂 Project Structure
-```
-.
-├── dags/
-│   └── db2_to_lambda_pipeline.py
-├── docker-compose.yaml
-├── README.md
-```
+## 🔒 Security
+
+- AWS credentials are not stored in source code.
+- Sensitive configuration is provided through environment variables.
+- `.env` is excluded through `.gitignore`.
+- No AWS secrets should be committed to the repository.
+
 ---
-## 📊 Sample Output
-Example of transformed dataset:
+
+## 📊 Example Output
+
+Example of a processed dataset:
 
 | userId | title_length |
-| ------ | ------------ |
-| 1      | 45           |
-| 2      | 32           |
-| 3      | 28           |
+|---:|---:|
+| 1 | 45 |
+| 2 | 32 |
+| 3 | 28 |
+
 ---
+
 ## 📈 Airflow DAG
 
-* DAG Name: `db2_to_lambda_pipeline`
-* Tasks:
+The Airflow DAG contains three primary stages:
 
-  * extract
-  * transform
-  * load
+```text
+Extract
+   ↓
+Transform
+   ↓
+Load
+```
+
+Airflow provides scheduling, task orchestration, dependency management, and execution logging.
+
+> **Note:** Replace `<airflow_dag>.py` above with the actual DAG filename in the repository.
+
 ---
+
 ## 🚀 Future Improvements
-* Add AWS Lambda trigger after S3 upload
-* Implement data validation (Great Expectations)
-* Add monitoring & alerting (Slack / Email)
-* Integrate with data warehouse (Snowflake / Redshift)
+
+- Add AWS Lambda integration after S3 upload
+- Implement data-quality validation
+- Add monitoring and alerting
+- Add retry and failure-notification strategies
+- Integrate with Snowflake or Amazon Redshift
+- Add automated CI testing with GitHub Actions
+
 ---
+
 ## 💼 Key Learnings
-* Built a production-style ETL pipeline
-* Orchestrated workflows using Apache Airflow
-* Integrated cloud storage (AWS S3)
-* Implemented secure credential handling
-* Containerized application using Docker
+
+- Built an end-to-end ETL pipeline using Python and Apache Airflow
+- Orchestrated data workflows using Airflow DAGs
+- Integrated Python pipelines with Amazon S3
+- Performed data transformation using Pandas
+- Containerized the development environment using Docker
+- Implemented secure handling of AWS credentials
+
 ---
+
 ## 👤 Author
 
-**Aneesh Pasnoor
+**Aneesh Pasnoor**
