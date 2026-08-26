@@ -53,7 +53,7 @@ def load():
 
 # 🔹 DAG definition
 dag = DAG(
-    dag_id="db2_to_lambda_pipeline",
+    dag_id="weather_etl_pipeline",
     start_date=datetime(2024, 1, 1),
     schedule="@daily",
     catchup=False,
